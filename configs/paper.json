@@ -1,0 +1,15 @@
+{
+  "algorithmVersion": "roc-calib-region-v1",
+  "objective": "uniform mean of per-object mean distances to foreground pixel cells",
+  "initialization": "object-representative PnP",
+  "optimizer": "Powell",
+  "xtol": 0.00001,
+  "ftol": 0.00001,
+  "maxiter": 260,
+  "localProbeCount": 216,
+  "rotationProbeDegrees": 0.01,
+  "translationProbeMeters": 0.001,
+  "probeScales": [1.0, 0.1, 0.01],
+  "absoluteAcceptanceTolerance": 1e-12,
+  "relativeAcceptanceTolerance": 1e-12
+}

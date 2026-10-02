@@ -1,0 +1,13 @@
+.git
+.venv
+data
+outputs
+.models
+web/node_modules
+web/dist
+web/.next
+web/.wrangler
+**/__pycache__
+**/*.tsbuildinfo
+demo/carla/clouds
+demo/carla/images

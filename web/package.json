@@ -1,0 +1,39 @@
+{
+  "name": "roc-calib-web",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vinext dev",
+    "build": "vinext build",
+    "start": "vinext start",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@types/three": "^0.185.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-rsc": "0.5.35",
+    "react-server-dom-webpack": "19.3.0",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "vinext": "1.0.1",
+    "vite": "8.3.2"
+  },
+  "type": "module",
+  "overrides": {
+    "satori": {
+      "fflate": "0.7.5"
+    }
+  }
+}

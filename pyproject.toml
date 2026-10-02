@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "roc-calib"
+version = "0.1.0"
+description = "Camera–LiDAR calibration from operator-confirmed regions"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+dependencies = [
+  "numpy==2.5.2", "scipy==1.18.0", "opencv-python-headless==4.14.0.94",
+  "pydantic==2.13.4", "fastapi==0.116.1", "starlette==0.47.3",
+  "uvicorn==0.35.0", "pillow==12.3.0", "PyYAML==6.0.3", "python-multipart==0.0.20",
+]
+
+[project.optional-dependencies]
+lidar = ["open3d-cpu==0.19.0", "small-gicp==1.0.1"]
+
+[project.scripts]
+roc-calib = "roc_calib.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

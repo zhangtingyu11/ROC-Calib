@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zhangtingyu11/AutoCalib/docs/paired-dataset.schema.json",
+  "title": "AutoCalib paired dataset",
+  "type": "object",
+  "required": ["formatVersion", "id", "rigId", "name", "cameras", "lidars"],
+  "properties": {
+    "formatVersion": {"const": 1},
+    "id": {"$ref": "#/$defs/identifier"},
+    "rigId": {"$ref": "#/$defs/identifier"},
+    "name": {"type": "string", "minLength": 1},
+    "cameras": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/camera"}
+    },
+    "lidars": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/lidar"}
+    }
+  },
+  "anyOf": [
+    {
+      "properties": {
+        "cameras": {"minItems": 1},
+        "lidars": {"minItems": 1}
+      }
+    },
+    {
+      "properties": {
+        "lidars": {"minItems": 2}
+      }
+    }
+  ],
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,119}$"
+    },
+    "frame": {
+      "type": "object",
+      "required": ["label", "path"],
+      "properties": {
+        "label": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "timestampNs": {
+          "oneOf": [
+            {"type": "integer"},
+            {"type": "string", "pattern": "^-?[0-9]+$"}
+          ]
+        },
+        "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "pointFormat": {"$ref": "#/$defs/pointFormat"}
+      }
+    },
+    "camera": {
+      "type": "object",
+      "required": ["id", "frames"],
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "name": {"type": "string"},
+        "topic": {"type": "string"},
+        "serial": {"type": "string"},
+        "model": {"type": "string"},
+        "intrinsic": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {"type": "number"}
+        },
+        "distortion": {
+          "type": "array",
+          "items": {"type": "number"}
+        },
+        "distortionModel": {"type": "string"},
+        "coordinateSystem": {"type": "string"},
+        "frames": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/frame"}
+        }
+      }
+    },
+    "lidar": {
+      "type": "object",
+      "required": ["id", "pointFormat", "frames"],
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "name": {"type": "string"},
+        "topic": {"type": "string"},
+        "pointFormat": {"$ref": "#/$defs/pointFormat"},
+        "frames": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/frame"}
+        }
+      }
+    },
+    "pointFormat": {
+      "oneOf": [
+        {
+          "enum": ["xyz-f32", "xyzi-f32", "xyzring-f32", "xyzir-f32", "autocalib-acp1"]
+        },
+        {
+          "type": "object",
+          "required": ["encoding", "fields"],
+          "properties": {
+            "encoding": {"enum": ["float32", "npy", "autocalib-acp1"]},
+            "fields": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"type": "string"}
+            },
+            "byteOrder": {"enum": ["little", "big"]}
+          }
+        }
+      ]
+    }
+  }
+}

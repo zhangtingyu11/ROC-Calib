@@ -1,0 +1,110 @@
+{
+  "method": "roc-calib-region-v1",
+  "statistics": "equal mean over 10 frozen groups",
+  "groups": [
+    {
+      "group": 0,
+      "label": "KITTI Odometry 09 left",
+      "pairCount": 20,
+      "pointCount": 3455,
+      "metrics": {
+        "rotationDeg": 0.2816211060562325,
+        "translationCm": 3.2028563758125377
+      }
+    },
+    {
+      "group": 1,
+      "label": "KITTI Odometry 09 right",
+      "pairCount": 20,
+      "pointCount": 2832,
+      "metrics": {
+        "rotationDeg": 0.03388472381372209,
+        "translationCm": 2.13042990973885
+      }
+    },
+    {
+      "group": 2,
+      "label": "KITTI Odometry 10 left",
+      "pairCount": 20,
+      "pointCount": 3198,
+      "metrics": {
+        "rotationDeg": 0.31437549322396907,
+        "translationCm": 3.688198062404674
+      }
+    },
+    {
+      "group": 3,
+      "label": "KITTI Odometry 10 right",
+      "pairCount": 20,
+      "pointCount": 3547,
+      "metrics": {
+        "rotationDeg": 0.2259018058718854,
+        "translationCm": 5.043319034753678
+      }
+    },
+    {
+      "group": 4,
+      "label": "nuScenes test group1",
+      "pairCount": 30,
+      "pointCount": 4300,
+      "metrics": {
+        "rotationDeg": 0.7196910034096567,
+        "translationCm": 6.087852672739559
+      }
+    },
+    {
+      "group": 5,
+      "label": "nuScenes test group2",
+      "pairCount": 30,
+      "pointCount": 3078,
+      "metrics": {
+        "rotationDeg": 0.5464239652662628,
+        "translationCm": 7.26772175199524
+      }
+    },
+    {
+      "group": 6,
+      "label": "CARLA static",
+      "pairCount": 20,
+      "pointCount": 2258,
+      "metrics": {
+        "rotationDeg": 0.11133400952782778,
+        "translationCm": 1.6136469879112478
+      }
+    },
+    {
+      "group": 8,
+      "label": "KITTI Raw",
+      "pairCount": 20,
+      "pointCount": 2198,
+      "metrics": {
+        "rotationDeg": 0.25592328943482234,
+        "translationCm": 4.678039913746694
+      }
+    },
+    {
+      "group": 9,
+      "label": "PandaSet",
+      "pairCount": 20,
+      "pointCount": 3329,
+      "metrics": {
+        "rotationDeg": 0.1256435996812448,
+        "translationCm": 9.302046989898997
+      }
+    },
+    {
+      "group": 10,
+      "label": "Waymo validation",
+      "pairCount": 20,
+      "pointCount": 5983,
+      "metrics": {
+        "rotationDeg": 0.22400434576304265,
+        "translationCm": 6.034879817527765
+      }
+    }
+  ],
+  "mean": {
+    "rotationDeg": 0.28388033420486664,
+    "translationCm": 4.904899151652924
+  }
+}

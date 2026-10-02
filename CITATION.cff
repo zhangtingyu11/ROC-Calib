@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "Please cite this software if you use ROC-Calib."
+title: "ROC-Calib: Camera–LiDAR Calibration from Operator-Confirmed Regions"
+type: software
+authors:
+  - name: ROC-Calib contributors
+version: 0.1.0
+repository-code: "https://github.com/zhangtingyu11/ROC-Calib"
+license: MIT

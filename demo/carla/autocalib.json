@@ -1,0 +1,230 @@
+{
+  "formatVersion": 1,
+  "id": "carla-demo",
+  "rigId": "carla-demo",
+  "name": "CARLA \u00b7 19 frames",
+  "cameras": [
+    {
+      "id": "front",
+      "intrinsic": [
+        800.0,
+        0.0,
+        800.0,
+        0.0,
+        800.0,
+        450.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "distortion": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "distortionModel": "radtan",
+      "frames": [
+        {
+          "label": "000",
+          "timestampNs": "25807011455",
+          "path": "images/000.jpg"
+        },
+        {
+          "label": "001",
+          "timestampNs": "32107011549",
+          "path": "images/001.jpg"
+        },
+        {
+          "label": "002",
+          "timestampNs": "63107012011",
+          "path": "images/002.jpg"
+        },
+        {
+          "label": "003",
+          "timestampNs": "69307012103",
+          "path": "images/003.jpg"
+        },
+        {
+          "label": "004",
+          "timestampNs": "17873047102",
+          "path": "images/004.jpg"
+        },
+        {
+          "label": "005",
+          "timestampNs": "50607011825",
+          "path": "images/005.jpg"
+        },
+        {
+          "label": "006",
+          "timestampNs": "42873047475",
+          "path": "images/006.jpg"
+        },
+        {
+          "label": "007",
+          "timestampNs": "11230278723",
+          "path": "images/007.jpg"
+        },
+        {
+          "label": "008",
+          "timestampNs": "110548620593",
+          "path": "images/008.jpg"
+        },
+        {
+          "label": "009",
+          "timestampNs": "22000693794",
+          "path": "images/009.jpg"
+        },
+        {
+          "label": "010",
+          "timestampNs": "28200693887",
+          "path": "images/010.jpg"
+        },
+        {
+          "label": "011",
+          "timestampNs": "77800694626",
+          "path": "images/011.jpg"
+        },
+        {
+          "label": "012",
+          "timestampNs": "29335492969",
+          "path": "images/012.jpg"
+        },
+        {
+          "label": "013",
+          "timestampNs": "129573048767",
+          "path": "images/013.jpg"
+        },
+        {
+          "label": "014",
+          "timestampNs": "154373049136",
+          "path": "images/014.jpg"
+        },
+        {
+          "label": "015",
+          "timestampNs": "135030280568",
+          "path": "images/015.jpg"
+        },
+        {
+          "label": "016",
+          "timestampNs": "90200694811",
+          "path": "images/016.jpg"
+        },
+        {
+          "label": "017",
+          "timestampNs": "16835492782",
+          "path": "images/017.jpg"
+        },
+        {
+          "label": "018",
+          "timestampNs": "41735493153",
+          "path": "images/018.jpg"
+        }
+      ]
+    }
+  ],
+  "lidars": [
+    {
+      "id": "lidar",
+      "pointFormat": "autocalib-acp1",
+      "frames": [
+        {
+          "label": "000",
+          "timestampNs": "25807011455",
+          "path": "clouds/000.bin"
+        },
+        {
+          "label": "001",
+          "timestampNs": "32107011549",
+          "path": "clouds/001.bin"
+        },
+        {
+          "label": "002",
+          "timestampNs": "63107012011",
+          "path": "clouds/002.bin"
+        },
+        {
+          "label": "003",
+          "timestampNs": "69307012103",
+          "path": "clouds/003.bin"
+        },
+        {
+          "label": "004",
+          "timestampNs": "17873047102",
+          "path": "clouds/004.bin"
+        },
+        {
+          "label": "005",
+          "timestampNs": "50607011825",
+          "path": "clouds/005.bin"
+        },
+        {
+          "label": "006",
+          "timestampNs": "42873047475",
+          "path": "clouds/006.bin"
+        },
+        {
+          "label": "007",
+          "timestampNs": "11230278723",
+          "path": "clouds/007.bin"
+        },
+        {
+          "label": "008",
+          "timestampNs": "110548620593",
+          "path": "clouds/008.bin"
+        },
+        {
+          "label": "009",
+          "timestampNs": "22000693794",
+          "path": "clouds/009.bin"
+        },
+        {
+          "label": "010",
+          "timestampNs": "28200693887",
+          "path": "clouds/010.bin"
+        },
+        {
+          "label": "011",
+          "timestampNs": "77800694626",
+          "path": "clouds/011.bin"
+        },
+        {
+          "label": "012",
+          "timestampNs": "29335492969",
+          "path": "clouds/012.bin"
+        },
+        {
+          "label": "013",
+          "timestampNs": "129573048767",
+          "path": "clouds/013.bin"
+        },
+        {
+          "label": "014",
+          "timestampNs": "154373049136",
+          "path": "clouds/014.bin"
+        },
+        {
+          "label": "015",
+          "timestampNs": "135030280568",
+          "path": "clouds/015.bin"
+        },
+        {
+          "label": "016",
+          "timestampNs": "90200694811",
+          "path": "clouds/016.bin"
+        },
+        {
+          "label": "017",
+          "timestampNs": "16835492782",
+          "path": "clouds/017.bin"
+        },
+        {
+          "label": "018",
+          "timestampNs": "41735493153",
+          "path": "clouds/018.bin"
+        }
+      ]
+    }
+  ]
+}

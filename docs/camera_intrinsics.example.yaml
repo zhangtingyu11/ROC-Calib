@@ -1,0 +1,16 @@
+# ROC-Calib 相机内参文件。当前标定组中的每个图像 topic 必须恰好出现一次。
+version: 1
+cameras:
+  - topic: /camera/front/image
+    camera_type: pinhole  # pinhole 或 fisheye
+    image_width: 1920
+    image_height: 1536
+    camera_matrix: [1200.0, 0.0, 960.0, 0.0, 1200.0, 768.0, 0.0, 0.0, 1.0]  # 按行展开的 3x3 K 矩阵
+    distortion_coefficients: [0.0, 0.0, 0.0, 0.0, 0.0]
+
+  - topic: /camera/rear/image
+    camera_type: fisheye
+    image_width: 1920
+    image_height: 1536
+    camera_matrix: [800.0, 0.0, 960.0, 0.0, 800.0, 768.0, 0.0, 0.0, 1.0]
+    distortion_coefficients: [0.0, 0.0, 0.0, 0.0]
