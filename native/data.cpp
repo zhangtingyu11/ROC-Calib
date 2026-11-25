@@ -17,7 +17,18 @@ static void rectangles(Pair& p){std::map<std::pair<int,int>,int> active;std::vec
  std::set<std::array<double,2>> X,Y;for(auto r:rect){X.insert({r[0],r[1]});Y.insert({r[2],r[3]});}std::map<std::array<double,2>,long> xi,yi;for(auto x:X){xi[x]=xi.size();p.xs.insert(p.xs.end(),x.begin(),x.end());}for(auto y:Y){yi[y]=yi.size();p.ys.insert(p.ys.end(),y.begin(),y.end());}for(auto r:rect){p.ix.push_back(xi[{r[0],r[1]}]);p.iy.push_back(yi[{r[2],r[3]}]);}
 }
 Dataset load_data(const fs::path& root,int group){
- auto base=root;auto req=read_json(base/"request.json");if(req.at("initialization_mode")!="forward")throw std::runtime_error("Forward initialization required");Dataset out;
+ auto base=root;auto req=read_json(base/"request.json");Dataset out;
+ const auto mode=req.at("initialization_mode").get<std::string>();
+ if(mode=="existing"){
+   const auto& values=req.at("base_matrix");
+   if(!values.is_array()||values.size()!=16)throw std::runtime_error("Expected a row-major 4x4 initial transform");
+   M4 seed=matrix(values);
+   M3 R=seed.block<3,3>(0,0);
+   if(!seed.allFinite()||!seed.row(3).isApprox(Eigen::RowVector4d(0,0,0,1),1e-6)||
+      !(R.transpose()*R).isApprox(M3::Identity(),1e-5)||std::abs(R.determinant()-1)>1e-5)
+     throw std::runtime_error("Initial transform must be a finite rigid camera-from-LiDAR matrix");
+   out.supplied_seed=seed;
+ }else if(mode!="forward")throw std::runtime_error("Unknown initialization mode");
  json expected=fs::exists(root/"checksums.json")?read_json(root/"checksums.json"):json::object();std::map<std::string,std::string> hashed;
  auto check=[&](const fs::path& p){auto key=p.string();if(!hashed.count(key))hashed[key]=sha(p);auto relative=fs::relative(p,root).generic_string();if(expected.contains(relative)&&hashed[key]!=expected.at(relative).get<std::string>())throw std::runtime_error("Source hash mismatch "+key);};check(base/"request.json");
  for(const auto& q:req.at("pairs")){

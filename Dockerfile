@@ -5,14 +5,24 @@ RUN npm ci
 COPY web/ ./
 RUN npm run check && npm run build
 
+FROM node:22.23.2-bookworm-slim@sha256:48e4b67d85f87bd551df43704e24d252f56cc5f8e9718841aace50f19948f0f9 AS native-build
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential cmake libopencv-calib3d-dev libeigen3-dev libssl-dev libblas-dev liblapack-dev
+COPY native /src/native
+RUN cmake -S /src/native -B /build -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build /build --target autocalib_native -j2
+
 FROM python:3.12-slim-bookworm@sha256:54c85f3c47607a77f32adec749d3c81d1348bf25833671f512b26a9b6d778cb3
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 SAM2_BUILD_CUDA=0 \
     AUTOCALIB_DATA_ROOT=/data AUTOCALIB_PUBLIC_ROOT=/web/public \
     OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 RUN apt-get update && apt-get install -y --no-install-recommends nginx ffmpeg git ca-certificates libgomp1 \
+    libopencv-calib3d406 libopencv-imgcodecs406 libopencv-imgproc406 libopencv-core406 liblapack3 libblas3 libssl3 \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=frontend /usr/local /usr/local
 COPY --from=frontend /web /web
+COPY --from=native-build /build/autocalib_native /usr/local/bin/autocalib_native
+RUN autocalib_native --help
 WORKDIR /service
 COPY requirements.lock ./
 RUN pip install -r requirements.lock

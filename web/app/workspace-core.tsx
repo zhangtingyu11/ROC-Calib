@@ -486,6 +486,8 @@ export type OptimizationResult = {
   storageKey?: string;
   matrix: number[];
   delta: number[];
+  pointCount?: number;
+  finalAuditCompleted?: boolean;
   originalError: number;
   optimizedError: number;
   fullMatchMatrix?: number[];
@@ -574,7 +576,7 @@ export const CALIBRATION_STORE = "calibrations-by-model";
 
 export const PAIRS_PER_PAGE = 6;
 
-export const CALIBRATION_ALGORITHM_VERSION = "roc-calib-region-v1";
+export const CALIBRATION_ALGORITHM_VERSION = "roc-calib-region-contour-20261026";
 
 export const LIDAR_CALIBRATION_ALGORITHM_VERSION = "fpfh-ransac-multiseed-small-gicp-contour-v12";
 

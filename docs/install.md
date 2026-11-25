@@ -1,6 +1,6 @@
 # Installation
 
-## Solver
+## Legacy Python solver
 
 Python 3.12 on Linux:
 
@@ -58,4 +58,4 @@ npm ci
 npm run dev
 ```
 
-The dev server forwards API requests to localhost:8000. Run `uvicorn roc_calib.main:app --port 8000` with `AUTOCALIB_DATA_ROOT` set to a writable directory. Manual drawing works without SAM2; SAM-assisted drawing needs the model dependencies used by the Docker image.
+Build the native target following the repository README and set `ROC_CALIB_NATIVE_BIN` to its absolute path in the API environment. The dev server forwards API requests to localhost:8000. Run `uvicorn roc_calib.main:app --port 8000` with `AUTOCALIB_DATA_ROOT` set to a writable directory. Manual drawing works without SAM2; SAM-assisted drawing needs the model dependencies used by the Docker image.

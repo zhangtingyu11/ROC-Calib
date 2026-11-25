@@ -1,4 +1,4 @@
-> This page describes the legacy workbench/Python solver. For the current paper C++ solver, see [paper solver](../../docs/paper-solver.md).
+> To run this example with the paper method, open **CARLA 示例** in the workbench, select **无初值 PnP**, and click **计算外参**, or follow the [C++ CLI instructions](../../docs/paper-solver.md). The Python command below runs the legacy region-only example.
 
 # CARLA example
 

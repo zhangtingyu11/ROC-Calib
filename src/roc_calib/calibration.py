@@ -10,7 +10,7 @@ from typing import Callable
 
 import cv2
 import numpy as np
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field
 from scipy.ndimage import distance_transform_edt, minimum_filter
 from scipy.optimize import minimize, minimize_scalar
 from scipy.sparse import coo_matrix
@@ -62,7 +62,7 @@ class CalibrationPair(BaseModel):
     mask_rle: list[int]
     intrinsic: list[float] = Field(min_length=9, max_length=9)
     distortion: list[float]
-    distortion_model: str = "rational"
+    distortion_model: str = Field(default="rational", validation_alias=AliasChoices("distortion_model", "distortionModel"))
     temporal_projection: dict | None = None
 
 

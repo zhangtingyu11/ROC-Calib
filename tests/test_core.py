@@ -12,7 +12,8 @@ os.environ["AUTOCALIB_DATA_ROOT"] = temporary.name
 
 from roc_calib.pixel_region import PixelRegion
 from roc_calib import groups
-from roc_calib.calibration import _resolve_cloud
+from roc_calib.calibration import CalibrationRequest, _resolve_cloud
+from roc_calib.native_solver import _write_request
 
 
 class CoreChecks(unittest.TestCase):
@@ -28,6 +29,26 @@ class CoreChecks(unittest.TestCase):
     def test_cloud_path_cannot_escape_root(self):
         with self.assertRaises(ValueError):
             _resolve_cloud("/data/cache/../../outside.bin")
+
+    def test_native_request_preserves_browser_model_and_cloud_indices(self):
+        pair = {
+            "annotation_id": "example", "cloud_url": "/data/cache/selected.bin",
+            "point_indices": [6, 2], "mask_width": 2, "mask_height": 2,
+            "mask_rle": [1, 2, 1], "intrinsic": np.eye(3).ravel().tolist(),
+            "distortion": [0.1, 0, 0, 0], "distortionModel": "fisheye",
+        }
+        cloud = groups.PREPARED_ROOT / "selected.bin"
+        cloud.parent.mkdir(parents=True, exist_ok=True)
+        cloud.touch()
+        request = CalibrationRequest(group_key="test", initialization_mode="forward",
+                                     base_matrix=np.eye(4).ravel().tolist(), pairs=[pair])
+        with tempfile.TemporaryDirectory() as scratch:
+            directory = Path(scratch)
+            _write_request(request, directory)
+            entry = json.loads((directory / "request.json").read_text())["pairs"][0]
+            self.assertEqual(entry["distortion_model"], "fisheye")
+            self.assertEqual(entry["point_indices"], [6, 2])
+            self.assertEqual((directory / entry["cloud_url"]).resolve(), cloud.resolve())
 
     def test_stale_save_preserves_newer_annotation(self):
         group = groups.create_group(groups.GroupCreate(name="conflict", rig_id="test"))

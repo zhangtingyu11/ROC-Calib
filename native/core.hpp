@@ -13,6 +13,7 @@
 #include <vector>
 #include <cmath>
 #include <functional>
+#include <optional>
 #include <chrono>
 #include <stdexcept>
 using json=nlohmann::json;namespace fs=std::filesystem;
@@ -42,7 +43,7 @@ struct Pair {
  std::string id;std::vector<V3> points;std::vector<double> intensity,c,w;std::vector<int> a,b;cv::Mat mask,color,gray;std::array<double,256> gray_rank{};M3 K;std::array<double,8> D{};std::string distortion;json temporal;
  std::vector<double> xs,ys;std::vector<long> ix,iy;
 };
-struct Dataset {std::vector<Pair> pairs;json provenance;};
+struct Dataset {std::vector<Pair> pairs;json provenance;std::optional<M4> supplied_seed;};
 Dataset load_data(const fs::path& root,int group);
 M4 initialize(const std::vector<Pair>& pairs);
 std::vector<V2> project(const Pair&,const M4&);

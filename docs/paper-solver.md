@@ -2,13 +2,13 @@
 
 ## Version and source integrity
 
-The numerical source comes from the adopted 2026-10-26 frozen experiment. `native/paper-source-sha256.json` records hashes of the archived files. Geometry, region/contour objectives, support construction, optimizers and boundary correction remain byte-identical. Release changes are limited to `data.cpp` (portable input paths/admission), `main.cpp` (default root and group label), `core.hpp` (specific OpenCV public includes), `CMakeLists.txt` (component-only OpenCV installations), and README. Unused historical appearance source files are retained for provenance but are not linked or enabled.
+The numerical source comes from the adopted 2026-10-26 frozen experiment. `native/paper-source-sha256.json` records hashes of the archived files. Geometry, region/contour objectives, support construction, optimizers and boundary correction remain byte-identical. Release changes are limited to `data.cpp` (portable input paths/admission), `main.cpp` (default root, group label and initialization dispatch), `core.hpp` (specific OpenCV public includes and optional user seed), `CMakeLists.txt` (component-only OpenCV installations), and README. Unused historical appearance source files are retained for provenance but are not linked or enabled.
 
 ## Inputs
 
 Pass `--root DIRECTORY` containing `request.json`, ACP1 point clouds, and optionally `checksums.json`. The existing CARLA request is an example. Each pair specifies `annotation_id`, `cloud_url`, `point_indices`, `mask_width`, `mask_height`, alternating row-major `mask_rle` starting with background, row-major 3x3 `intrinsic`, `distortion`, and `distortion_model`. `/data/cache/` URLs resolve relative to this directory; relative paths also resolve there. The optional existing `temporal_projection` object is forwarded unchanged. Data must already have the temporal compensation appropriate to its camera model; the loader does not invent timing metadata or apply additional deskew.
 
-ACP1: 16-byte header, magic ACP1, uint32 little-endian record count at byte4; each16-byte record stores float32 XYZ at offsets0,4,8 and a validity/type byte at12. Selected type2 or nonfinite records are rejected. All selected indices retain order; no downsampling is performed. Original masks and cloud files are hashed on entry and checked again before exit. Matching entries in optional checksums.json are verified; it is an integrity check, not reference geometry. Private research manifests are no longer required. `base_matrix` is not used to initialize the fit: initialization comes from the confirmed objects.
+ACP1: 16-byte header, magic ACP1, uint32 little-endian record count at byte4; each16-byte record stores float32 XYZ at offsets0,4,8 and a validity/type byte at12. Selected type2 or nonfinite records are rejected. All selected indices retain order; no downsampling is performed. Original masks and cloud files are hashed on entry and checked again before exit. Matching entries in optional checksums.json are verified; it is an integrity check, not reference geometry. Private research manifests are no longer required. In paper mode (`initialization_mode: "forward"`), PnP initializes the fit from confirmed objects. The optional workbench mode `existing` uses a supplied rigid `base_matrix` in row-major order.
 
 ## Commands and output
 
@@ -18,9 +18,9 @@ There is no internal time cutoff. An external `timeout` can be used by an operat
 
 The example downloader uses Python's standard library only; no Python is required by the C++ solver. Building requires Linux/POSIX, C++17, OpenCV, Eigen3, OpenSSL, OpenMP, BLAS and LAPACK. Numerical results may vary slightly across native library versions. The archival experiment used OpenCV4.2; release validation uses the available OpenCV4.6 environment. See release-validation.json for actual results, not a speed claim.
 
-## Legacy application
+## Workbench
 
-This release adds the paper C++ CLI. The existing web API and Python `roc-calib` command are unchanged legacy implementations. The native request uses the same saved pair fields, but users must supply accessible ACP1 assets and compatible camera/temporal fields. No claim is made that browser calibration has been upgraded.
+The workbench image builds and includes `autocalib_native`. The Calibrate button submits confirmed pairs and camera parameters to the API. The API resolves the selected clouds, runs the binary, and streams the verified transform to the browser. The exported result records the algorithm version and initialization mode. For local API development, set `ROC_CALIB_NATIVE_BIN` to the absolute path of your built executable. The separate Python `roc-calib` command retains the legacy region-only method.
 
 ## Release validation limits
 

@@ -2272,11 +2272,17 @@ export default function Home() {
       consumeEvent(buffer);
       const payload = streamResult.payload;
       if (!payload?.matrix || payload.matrix.length !== 16) throw new Error("本机求解器未返回有效外参");
+      if (payload.algorithmVersion !== CALIBRATION_ALGORITHM_VERSION || !payload.finalAuditCompleted ||
+          typeof payload.originalError !== "number" || typeof payload.optimizedError !== "number") {
+        throw new Error("求解器版本或复核结果不匹配，请更新工作台后重算");
+      }
       const result: OptimizationResult = {
         matrix: payload.matrix,
         delta: payload.delta ?? [0, 0, 0, 0, 0, 0],
-        originalError: payload.originalError ?? 0,
-        optimizedError: payload.optimizedError ?? 0,
+        originalError: payload.originalError,
+        pointCount: payload.pointCount,
+        finalAuditCompleted: payload.finalAuditCompleted,
+        optimizedError: payload.optimizedError,
         fullMatchMatrix: payload.fullMatchMatrix,
         fullMatchError: payload.fullMatchError,
         originalIoU: payload.originalIoU,
@@ -2313,7 +2319,7 @@ export default function Home() {
         qualityWarnings: payload.qualityWarnings,
         pairDiagnostics: payload.pairDiagnostics,
         suggestedReviewAnnotationIds: payload.suggestedReviewAnnotationIds,
-        algorithmVersion: payload.algorithmVersion ?? CALIBRATION_ALGORITHM_VERSION,
+        algorithmVersion: payload.algorithmVersion,
         distortionModel: modelToRun,
         distortionParameterCount: payload.distortionParameterCount ?? pairs[0]?.distortion.length,
       };
@@ -2323,11 +2329,11 @@ export default function Home() {
       const resultTime = new Date(result.generatedAt).toLocaleString("zh-CN");
       const resultModelLabel = result.distortionModel === "fisheye" ? "鱼眼" : result.distortionModel === "radtan" ? "RadTan" : "Rational";
       const resultVersion: ExtrinsicVersion = {
-        id: [currentCalibrationKey, result.distortionModel, "visible-edge", result.generatedAt].join(":"),
+        id: [currentCalibrationKey, result.distortionModel, result.algorithmVersion, result.generatedAt].join(":"),
         groupKey: currentCalibrationKey,
         matrix: result.matrix,
         createdAt: result.generatedAt,
-        label: `${resultModelLabel} · 最终结果 · ${resultTime}`,
+        label: `${resultModelLabel} · 区域＋轮廓 · ${resultTime}`,
         source: "calculated",
         isInitial: false,
         optimization: result,
@@ -2348,14 +2354,7 @@ export default function Home() {
       }
       await storeCalibration(result);
       setComparisonView({ zoom: 1, centerX: 0.5, centerY: 0.5 });
-      const reviewPairNumbers = (result.suggestedReviewAnnotationIds ?? [])
-        .map((id) => eligibleAnnotations.findIndex((annotation) => annotation.id === id) + 1)
-        .filter((index) => index > 0);
-      const diagnosis = [
-        ...(result.qualityWarnings ?? []),
-        ...(reviewPairNumbers.length ? [`建议复核配对 ${reviewPairNumbers.map((index) => `#${index}`).join("、")}`] : []),
-      ];
-      setOptimizationFeedback(`${modelIndex + 1}/${modelsToRun.length} · ${modelToRun} 已生成：Mask 内点 ${Math.round((result.optimizedInsideRatio ?? 0) * 100)}%，平均越界 ${(result.optimizedContainmentError ?? 0).toFixed(2)} px，可见背景误入 ${Math.round((result.backgroundIntrusionRatio ?? 0) * 100)}%，忽略后方遮挡点 ${result.occludedBackgroundCount ?? 0}${result.partialRefinementAccepted === false ? "，局部精调退化已自动回退" : ""} · ${result.pairCount} 个等权配对${diagnosis.length ? `；诊断：${diagnosis.join("；")}` : "；质量检查通过"}`);
+      setOptimizationFeedback(`${modelToRun} · ${result.pairCount} 对配对，${result.pointCount} 个选中点，最终损失 ${result.optimizedError.toPrecision(5)}。数值复核通过，请检查投影。`);
       updateModelProgress(modelIndex, 100);
       // Keep the point-cloud annotation view after calibration. The comparison
       // page remains available as an explicit user action, regardless of whether
@@ -2395,6 +2394,7 @@ export default function Home() {
       transform: "camera_from_lidar",
       convention: { vectors: "column", translationUnit: "meter", cameraAxes: "x-right, y-down, z-forward", matrixOrder: "row-major", equation: "p_camera = T_camera_from_lidar @ p_lidar" },
       algorithmVersion: version.optimization?.algorithmVersion ?? "imported",
+      initializationMode: version.optimization?.initializationMode ?? null,
       sourceAnnotations: version.optimization ? { ids: version.optimization.annotationIds, savedAt: version.optimization.annotationSavedAts } : null,
       projectionModel: version.distortionModel ?? version.optimization?.distortionModel ?? null,
       version: {
@@ -2946,10 +2946,18 @@ export default function Home() {
                   <div><span>结果诊断</span><b>{comparisonOptimization.qualityStatus === "good" ? "质量良好" : comparisonOptimization.qualityStatus === "warning" ? "建议补充配对" : comparisonOptimization.qualityStatus === "poor" ? "建议复核" : "请检查投影"}</b></div>
                   <div><span>投影模型</span><b>{comparisonOptimization.distortionModel === "fisheye" ? "鱼眼" : comparisonOptimization.distortionModel === "radtan" ? "针孔 RadTan" : `针孔 Rational${(comparisonOptimization.distortionParameterCount ?? 8) < 8 ? "（缺失项补0）" : ""}`}</b></div>
               <div><span>联合配对</span><b>{comparisonOptimization.pairCount} 对</b></div>
+              {comparisonOptimization.algorithmVersion === CALIBRATION_ALGORITHM_VERSION ? <>
+                <div><span>求解器</span><b>C++ 区域＋轮廓</b></div>
+                <div><span>选中点数</span><b>{comparisonOptimization.pointCount}</b></div>
+                <div><span>初始损失</span><b>{comparisonOptimization.originalError.toPrecision(5)}</b></div>
+                <div><span>最终损失</span><b>{comparisonOptimization.optimizedError.toPrecision(5)}</b></div>
+                <div><span>数值复核</span><b>{comparisonOptimization.finalAuditCompleted ? "通过" : "未记录"}</b></div>
+              </> : <>
               <div><span>自动迭代</span><b>{comparisonOptimization.iterationCount ?? 1} 轮 · {comparisonOptimization.converged ? "已收敛" : "达到上限"}</b></div>
               <div><span>初始入 Mask</span><b>{Math.round((comparisonOptimization.originalInsideRatio ?? 0) * 100)}%</b></div>
               <div><span>最终入 Mask</span><b>{Math.round((comparisonOptimization.optimizedInsideRatio ?? 0) * 100)}%</b></div>
               <div><span>平均越界距离</span><b>{(comparisonOptimization.optimizedContainmentError ?? 0).toFixed(2)} px</b></div>
+              </>}
               {['Roll', 'Pitch', 'Yaw', 'X', 'Y', 'Z'].map((label, index) => <div key={label}><span>Δ{label}</span><b>{index < 3 ? `${(comparisonOptimization.delta[index] * 180 / Math.PI).toFixed(3)}°` : `${comparisonOptimization.delta[index].toFixed(3)} m`}</b></div>)}
             </div>}
           </div>}

@@ -13,22 +13,12 @@ import time
 _SLOTS = threading.BoundedSemaphore(max(1, min(3, os.cpu_count() or 1)))
 
 
-def _solve_in_child(payload: dict, sender, action=None) -> None:
+def _solve_in_child(payload: dict, sender, action) -> None:
     try:
         def progress(percent, message, details=None):
             sender.send(("progress", percent, message, details))
-        if action is not None:
-            from .calibration_review import dispatch
-            sender.send(("result", dispatch(action, payload, progress)))
-            return
-        from .calibration import CalibrationRequest
-        from .region_solver import optimize
-        # Preparation caches cannot be shared across process address spaces.
-        payload = {**payload, "optimization_batch_id": None, "optimization_batch_size": 1}
-        request = CalibrationRequest.model_validate(payload)
-        def progress(percent, message, details=None):
-            sender.send(("progress", percent, message, details))
-        sender.send(("result", optimize(request, progress)))
+        from .calibration_review import dispatch
+        sender.send(("result", dispatch(action, payload, progress)))
     except Exception as error:
         sender.send(("error", str(error)))
     finally:
@@ -46,6 +36,9 @@ def optimize_isolated(request, progress=None, *, action=None, cancelled=None) ->
             acquired = _SLOTS.acquire(timeout=.2)
         if cancelled is not None and cancelled.is_set():
             raise RuntimeError('任务已取消')
+        if action is None:
+            from .native_solver import optimize
+            return optimize(request, progress, cancelled)
         # Never fork a web process that may already own a CUDA context.
         context = multiprocessing.get_context("spawn")
         receiver, sender = context.Pipe(duplex=False)

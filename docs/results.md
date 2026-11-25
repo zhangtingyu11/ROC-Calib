@@ -20,4 +20,4 @@ RRE is the sum of absolute intrinsic ZYX Euler angles of the relative rotation i
 
 [Machine-readable archived metrics](../configs/paper-20261026-results.json). The public CARLA example preserves the same20 pairs and full clouds. Other datasets require licensed raw data and their prepared annotations; this release does not redistribute those inputs or claim one-command reproduction of all ten groups.
 
-[Legacy region-only results](legacy-results.md) remain separate and use a different rotation metric. The workbench still invokes that legacy solver.
+[Legacy region-only results](legacy-results.md) remain separate and use a different rotation metric. The workbench now uses the paper C++ solver.

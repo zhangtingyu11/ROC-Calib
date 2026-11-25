@@ -23,13 +23,13 @@ Python is used only by the existing optional asset downloader. Data reading, PnP
 
 Ten groups, 220 object pairs, 34,178 selected points: mean **RRE 0.4062°**, mean **RTE 0.04655 m**. RRE is the sum of absolute intrinsic ZYX Euler angles of the relative rotation, not the geodesic rotation angle. [Per-group archived results](docs/results.md).
 
-## Annotation workbench and legacy solver
+## Annotation and calibration workbench
 
 ![Calibration workspace](docs/assets/workspace.png)
 
-The SAM2-assisted annotation workbench remains available with `./start.sh`, including `./start.sh --cpu`. **Its Calibrate button and the `roc-calib` Python command still run the legacy region-only solver, not the paper C++ solver.** Use the native command above for the paper method. UI backend migration is not part of this source release. [Workbench instructions](docs/usage.md).
+Run `./start.sh` (or `./start.sh --cpu`) and open http://localhost:3000. The **计算外参** button runs the same C++ binary as the paper CLI. Choose **无初值 PnP** for the paper workflow. **基于初始外参精调** starts the same optimization from your selected transform. To update an existing installation, pull `main` and rerun the start command. UI backend migration is not part of this source release. [Workbench instructions](docs/usage.md).
 
-The old region-only results and commands remain documented in [legacy results](docs/legacy-results.md). Their rotation metric differs from the current paper metric.
+The standalone Python command `roc-calib` still uses the legacy region-only solver. Its results and commands remain documented in [legacy results](docs/legacy-results.md). Their rotation metric differs from the current paper metric.
 
 ## License
 

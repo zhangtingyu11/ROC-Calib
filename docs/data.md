@@ -1,4 +1,4 @@
-> This page describes the legacy workbench/Python solver. For the current paper C++ solver, see [paper solver](paper-solver.md).
+> For the C++ solver’s saved-pair input format, see [paper solver](paper-solver.md).
 
 # Data format
 
