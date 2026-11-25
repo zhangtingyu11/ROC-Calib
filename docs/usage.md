@@ -1,3 +1,5 @@
+> This page describes the legacy workbench/Python solver. For the current paper C++ solver, see [paper solver](paper-solver.md).
+
 # 使用方法
 
 启动 `./start.sh`，打开 http://localhost:3000。

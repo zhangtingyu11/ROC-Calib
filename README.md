@@ -1,68 +1,36 @@
 # ROC-Calib
 
-**Camera–LiDAR Calibration from Operator-Confirmed Regions**
+**Camera–LiDAR calibration from operator-confirmed regions**
 
-[中文](README_zh-CN.md) · [Usage](docs/usage.md) · [Data format](docs/data.md) · [Results](docs/results.md)
+[中文](README_zh-CN.md) · [Paper solver](docs/paper-solver.md) · [Workbench](docs/usage.md) · [Results](docs/results.md)
 
-Select the same objects in an image and a point cloud. ROC-Calib estimates the camera–LiDAR transform from these region pairs, without a calibration target or a supplied initial pose. SAM2 can help draw image masks.
+This repository now includes the **2026-10-26 paper solver**: all-point PnP, coarse region alignment, fine region + sampling-aware bounded contour optimization, and boundary-preserving refinement. The solver is standalone C++17, runs on CPU, and uses no supplied extrinsic estimate or LiDAR intensity. It has no gradient-sampling continuation or internal time cutoff.
+
+## Run the paper solver (Linux / WSL)
+
+```sh
+sudo apt-get install build-essential cmake libeigen3-dev libopencv-dev libssl-dev libblas-dev liblapack-dev
+cmake -S native -B build/native -DCMAKE_BUILD_TYPE=Release
+cmake --build build/native -j4
+python3 tools/download_demo.py
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 build/native/autocalib_native \
+  --root demo/carla --group 6 --output outputs/paper-carla.json
+```
+
+Python is used only by the existing optional asset downloader. Data reading, PnP, optimization and verification execute in C++ without Python. The final row-major camera-from-LiDAR matrix is `solve.matrix`; translation is in meters. See [input format, provenance and validation](docs/paper-solver.md).
+
+## Paper results
+
+Ten groups, 220 object pairs, 34,178 selected points: mean **RRE 0.4062°**, mean **RTE 0.04655 m**. RRE is the sum of absolute intrinsic ZYX Euler angles of the relative rotation, not the geodesic rotation angle. [Per-group archived results](docs/results.md).
+
+## Annotation workbench and legacy solver
 
 ![Calibration workspace](docs/assets/workspace.png)
 
-## Try the solver
+The SAM2-assisted annotation workbench remains available with `./start.sh`, including `./start.sh --cpu`. **Its Calibrate button and the `roc-calib` Python command still run the legacy region-only solver, not the paper C++ solver.** Use the native command above for the paper method. UI backend migration is not part of this source release. [Workbench instructions](docs/usage.md).
 
-Python 3.12, Linux. The saved-pair example runs on CPU; it does not need SAM2 or a running website.
-
-```bash
-git clone https://github.com/zhangtingyu11/ROC-Calib.git
-cd ROC-Calib
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.lock -e .
-python tools/download_demo.py
-roc-calib demo/carla/request.json --initial demo/carla/initial.json \
-  --output outputs/carla.json --verify demo/carla/expected.json
-```
-
-The example uses 20 frozen object pairs from 19 full-density CARLA frames. Its initial pose was computed from object correspondences. Omit `--initial` to compute a new PnP initialization.
-
-The output contains a row-major 4×4 matrix: `p_camera = T_camera_from_lidar @ p_lidar`. Translation is in meters.
-
-## Open the workbench
-
-Docker with NVIDIA Container Toolkit:
-
-```bash
-./start.sh
-```
-
-Open **http://localhost:3000**. Create a group, add paired images and clouds, select matching object regions, then click **计算外参** (Calibrate). See the [illustrated workflow](docs/usage.md).
-
-```bash
-./start.sh --cpu                         # CPU-only, including segmentation
-ROC_CALIB_PORT=3002 ./start.sh           # use another port
-```
-
-Data stays in `./data`. The server binds to localhost by default. [Installation and remote access](docs/install.md).
-
-## Results
-
-| Configuration | Groups | Object pairs | Mean rotation error | Mean translation error |
-| --- | ---: | ---: | ---: | ---: |
-| ROC-Calib region objective | 10 | 220 | 0.284° | 4.90 cm |
-
-Equal mean over ten fixed annotation groups. These numbers describe the frozen observations, not an independent repeat of manual annotation. The workbench uses the same region objective and acceptance protocol. [Per-group results and reproduction](docs/results.md).
-
-## Citation
-
-```bibtex
-@software{roc_calib_2026,
-  author = {{ROC-Calib contributors}},
-  title = {ROC-Calib: Camera--LiDAR Calibration from Operator-Confirmed Regions},
-  year = {2026},
-  url = {https://github.com/zhangtingyu11/ROC-Calib}
-}
-```
+The old region-only results and commands remain documented in [legacy results](docs/legacy-results.md). Their rotation metric differs from the current paper metric.
 
 ## License
 
-[MIT](LICENSE). External models and datasets retain their own licenses. [Third-party notices](NOTICE.md).
+[MIT](LICENSE) for project code. Vendored numerical dependencies retain their own notices in `native/vendor`; external models and datasets retain their own licenses. [Third-party notices](NOTICE.md).

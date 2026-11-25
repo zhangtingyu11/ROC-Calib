@@ -106,5 +106,6 @@
   "mean": {
     "rotationDeg": 0.28388033420486664,
     "translationCm": 4.904899151652924
-  }
+  },
+  "releaseVersionNote": "Legacy region-only Python solver. Current paper C++: docs/paper-solver.md and configs/paper-20261026-results.json"
 }

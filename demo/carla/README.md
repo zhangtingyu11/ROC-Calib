@@ -1,3 +1,5 @@
+> This page describes the legacy workbench/Python solver. For the current paper C++ solver, see [paper solver](../../docs/paper-solver.md).
+
 # CARLA example
 
 19 complete point clouds, 19 images and 20 saved object pairs. Download the raw inputs from the repository root:

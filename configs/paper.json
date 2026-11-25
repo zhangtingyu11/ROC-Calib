@@ -3,13 +3,18 @@
   "objective": "uniform mean of per-object mean distances to foreground pixel cells",
   "initialization": "object-representative PnP",
   "optimizer": "Powell",
-  "xtol": 0.00001,
-  "ftol": 0.00001,
+  "xtol": 1e-05,
+  "ftol": 1e-05,
   "maxiter": 260,
   "localProbeCount": 216,
   "rotationProbeDegrees": 0.01,
   "translationProbeMeters": 0.001,
-  "probeScales": [1.0, 0.1, 0.01],
+  "probeScales": [
+    1.0,
+    0.1,
+    0.01
+  ],
   "absoluteAcceptanceTolerance": 1e-12,
-  "relativeAcceptanceTolerance": 1e-12
+  "relativeAcceptanceTolerance": 1e-12,
+  "releaseVersionNote": "Legacy region-only Python solver. Current paper C++: docs/paper-solver.md and configs/paper-20261026-results.json"
 }

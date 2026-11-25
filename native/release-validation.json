@@ -1,0 +1,23 @@
+{
+  "releaseDate": "2026-11-25",
+  "archivedAlgorithmDate": "2026-10-26",
+  "test": "portable input adapter CARLA smoke solve",
+  "pairs": 20,
+  "selectedPoints": 2258,
+  "completed": true,
+  "finalAuditCompleted": true,
+  "pnpMaxElementDifference": 5.727278207245945e-09,
+  "finalMatrixMaxElementDifference": 0.0027213079776475246,
+  "lossAbsoluteDifference": 0.0021140171848177524,
+  "exactArchivedResultReproduced": false,
+  "buildEnvironment": "Ubuntu24.04 GCC13.3 OpenCV4.6",
+  "archivedEnvironment": "OpenCV4.2",
+  "releaseModifiedFiles": [
+    "CMakeLists.txt",
+    "core.hpp",
+    "data.cpp",
+    "main.cpp",
+    "README.md"
+  ],
+  "scope": "Numerical source unchanged. Library/build difference and small PnP difference can alter numerical optimization. No accuracy equivalence or speedup claim. No target-data tuning."
+}

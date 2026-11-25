@@ -1,0 +1,64 @@
+[
+  {
+    "file": "__lbfgsb.c",
+    "url": "https://raw.githubusercontent.com/scipy/scipy/v1.16.2/scipy/optimize/__lbfgsb.c",
+    "originalSHA256": "4b2ca77f4ce0e59af589986716e5a42bbc6f8321ecf4cf76436c210f7c1b4617",
+    "localSHA256": "4b2ca77f4ce0e59af589986716e5a42bbc6f8321ecf4cf76436c210f7c1b4617",
+    "change": "Unchanged"
+  },
+  {
+    "file": "__lbfgsb.h",
+    "url": "https://raw.githubusercontent.com/scipy/scipy/v1.16.2/scipy/optimize/__lbfgsb.h",
+    "originalSHA256": "0280f8a5907a3eeec38859c1acd44deeef810da0589cce50ad57654f25f4d90f",
+    "localSHA256": "c4dabdcf5a93e69a1c5a4603cb1a2a82d5450e96d50c9acda1550d24001106ae",
+    "change": "Remove Python/NumPy wrappers; expose native entrypoints"
+  },
+  {
+    "file": "__slsqp.c",
+    "url": "https://raw.githubusercontent.com/scipy/scipy/v1.16.2/scipy/optimize/__slsqp.c",
+    "originalSHA256": "983d4c9aa28928ff3aaa56f9c99978b11c4b5db8adf4d70d57f34b7ab53a2c39",
+    "localSHA256": "983d4c9aa28928ff3aaa56f9c99978b11c4b5db8adf4d70d57f34b7ab53a2c39",
+    "change": "Unchanged"
+  },
+  {
+    "file": "__slsqp.h",
+    "url": "https://raw.githubusercontent.com/scipy/scipy/v1.16.2/scipy/optimize/__slsqp.h",
+    "originalSHA256": "0c5d11b76020dcdfbb3b55a64ac70340184bae7484493a46fbb2867a6dabc5fa",
+    "localSHA256": "352900aaf19c743b0718f04bd94036c9fd913036bba358fa5e41f1be0f64e95a",
+    "change": "Remove Python/NumPy wrappers; expose native entrypoints"
+  },
+  {
+    "file": "__nnls.c",
+    "url": "https://raw.githubusercontent.com/scipy/scipy/v1.16.2/scipy/optimize/__nnls.c",
+    "originalSHA256": "bf9228b49a696cae15b26c24275508580d7965726df08efbcd91cf04d8e548a2",
+    "localSHA256": "bf9228b49a696cae15b26c24275508580d7965726df08efbcd91cf04d8e548a2",
+    "change": "Unchanged"
+  },
+  {
+    "file": "__nnls.h",
+    "url": "https://raw.githubusercontent.com/scipy/scipy/v1.16.2/scipy/optimize/__nnls.h",
+    "originalSHA256": "a68f214a640c08fe382cb69e829afe79767f91f6744f043d1da9d08e0d957857",
+    "localSHA256": "a68f214a640c08fe382cb69e829afe79767f91f6744f043d1da9d08e0d957857",
+    "change": "Unchanged"
+  },
+  {
+    "file": "sqpnp.cpp",
+    "url": "https://raw.githubusercontent.com/opencv/opencv/4.12.0/modules/calib3d/src/sqpnp.cpp",
+    "originalSHA256": "d2884136a49a1436b17a6fa7f16edc31e20c5fdd8f3d07ab725fa4231785bd0c",
+    "localSHA256": "501f83ed4362d3f72820ac65287ed292935d5d1d6976aa5cd11a2d2485d5a0e4",
+    "change": "Replace private precompiled header with public core/check headers"
+  },
+  {
+    "file": "sqpnp.hpp",
+    "url": "https://raw.githubusercontent.com/opencv/opencv/4.12.0/modules/calib3d/src/sqpnp.hpp",
+    "originalSHA256": "52f0e00c4efde64959c0e000b192d20155e2835d08a99cac9e490332af644c45",
+    "localSHA256": "52f0e00c4efde64959c0e000b192d20155e2835d08a99cac9e490332af644c45",
+    "change": "Unchanged"
+  },
+  {
+    "file": "json.hpp",
+    "source": "/home/zty/.cache/autocalib-benchmarks/direct_visual_lidar_calibration/thirdparty/json/single_include/nlohmann/json.hpp",
+    "localSHA256": "7f58a8306376388b0109a3a30a0ce309ccae87bdd103def27d751f232b1ab1be",
+    "change": "Unchanged; embedded MIT license"
+  }
+]

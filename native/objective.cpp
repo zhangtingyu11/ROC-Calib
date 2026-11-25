@@ -1,0 +1,47 @@
+#include "objective.hpp"
+#include "contour.hpp"
+#include "continuous_region.hpp"
+#include "interpolated_region.hpp"
+#include <exception>
+extern "C" int cauchy_scores_native(const double*,long,const double*,long,const long*,const long*,long,const double*,long,double,double*);
+std::vector<Jac> jacobian(const Pair& p,const M4& T){std::vector<Jac> out(p.points.size());if(!p.temporal.is_null()){for(int axis=0;axis<6;++axis){Vec7 d=Vec7::Zero();d[axis]=.01*units[axis];auto a=project(p,delta(d)*T),b=project(p,delta(-d)*T);for(size_t i=0;i<a.size();++i)out[i].col(axis)=(a[i]-b[i])/.02;}return out;}
+ for(size_t i=0;i<p.points.size();++i){V3 c=T.block<3,3>(0,0)*p.points[i]+T.block<3,1>(0,3);double z=c.z(),x=c.x()/z,y=c.y()/z,r=x*x+y*y;auto d=p.D;double a00,a01,a11;
+ if(p.distortion=="fisheye"){double rr=std::sqrt(r),th=std::atan(rr),t2=th*th,td=th*(1+d[0]*t2+d[1]*t2*t2+d[2]*std::pow(t2,3)+d[3]*std::pow(t2,4)),dt=(1+3*d[0]*t2+5*d[1]*t2*t2+7*d[2]*std::pow(t2,3)+9*d[3]*std::pow(t2,4))/(1+r),s=rr>1e-12?td/rr:1,q=0;if(rr>1e-4)q=(dt-s)/r;else if(rr>1e-12)q=2*(d[0]-1./3)+4*(1./5-d[0]+d[1])*r+6*(-1./7+14*d[0]/15-5*d[1]/3+d[2])*r*r;a00=s+q*x*x;a01=q*x*y;a11=s+q*y*y;
+ }else{double num=1+d[0]*r+d[1]*r*r+d[4]*r*r*r,dn=d[0]+2*d[1]*r+3*d[4]*r*r,den=1,dd=0;if(p.distortion!="radtan"){den=1+d[5]*r+d[6]*r*r+d[7]*r*r*r;dd=d[5]+2*d[6]*r+3*d[7]*r*r;}double rad=num/den,dr=(dn*den-num*dd)/(den*den);a00=rad+2*x*x*dr+2*d[2]*y+6*d[3]*x;a01=2*x*y*dr+2*d[2]*x+2*d[3]*y;a11=rad+2*y*y*dr+6*d[2]*y+2*d[3]*x;}
+ Eigen::Matrix<double,2,3> norm;norm<<1/z,0,-x/z,0,1/z,-y/z;Eigen::Matrix2d lens;lens<<p.K(0,0)*a00,p.K(0,0)*a01,p.K(1,1)*a01,p.K(1,1)*a11;Eigen::Matrix<double,2,3> D=lens*norm;out[i].leftCols<3>()=D*(-skew(c));out[i].rightCols<3>()=D;for(int j=0;j<6;++j)out[i].col(j)*=units[j];}return out;
+}
+Evaluation objective(const std::vector<Pair>& pairs,const M4& T,double b,bool coarse,bool score){if(!T.allFinite()||!std::isfinite(b)||b<=0)throw std::runtime_error("Invalid objective state");Evaluation out{0,Vec7::Zero(),0,0};std::vector<Appearance> apps(pairs.size());std::vector<std::vector<Jac>> jacs(pairs.size());std::vector<Evaluation> per(pairs.size(),Evaluation{0,Vec7::Zero(),0,0});std::vector<std::exception_ptr> failures(pairs.size());
+ #pragma omp parallel for num_threads(4) schedule(static)
+ for(size_t k=0;k<pairs.size();++k){try{
+ const auto& p=pairs[k];auto& local=per[k];auto uv=project(p,T);
+ std::vector<double> coords;std::vector<size_t> active;
+ for(size_t i=0;i<uv.size();++i){
+   auto u=uv[i];
+   bool inside=u.x()>=-.5&&u.x()<p.mask.cols-.5&&u.y()>=-.5&&u.y()<p.mask.rows-.5
+       &&p.mask.at<uint8_t>(int(std::floor(u.y()+.5)),int(std::floor(u.x()+.5)))>0;
+   if(!coarse)inside=region_inside(p,u);
+   if(coarse||!inside){active.push_back(i);coords.push_back(u.x());coords.push_back(u.y());}
+ }
+ std::vector<double> gs(4*active.size());
+ if(!active.empty()&&cauchy_scores_native(p.xs.data(),p.xs.size()/2,p.ys.data(),p.ys.size()/2,
+       p.ix.data(),p.iy.data(),p.ix.size(),coords.data(),active.size(),b,gs.data()))
+     throw std::runtime_error("Invalid Cauchy score");
+ auto J=score?jacobian(p,T):std::vector<Jac>();double value=0;Vec7 grad=Vec7::Zero();
+ for(size_t a=0;a<active.size();++a){
+   size_t i=active[a];double l=gs[4*a],mult=-1;
+   if(coarse)value-=l;else{auto gate=interpolated_gate(p,uv[i]);double d=std::sqrt(std::expm1(region_cost(p,uv[i]).first)),miss=.5+std::atan(d)/M_PI;value+=gate.first*miss*miss;mult=0;if(score && d>0)grad.head<6>()+=J[i].transpose()*gate.second*(miss*miss+gate.first*miss*(1+d*d)/(M_PI*d));}
+   if(score){grad.head<6>()+=mult*J[i].transpose()*V2(gs[4*a+1],gs[4*a+2]);grad[6]+=units[6]*mult*gs[4*a+3];}
+ }
+ local.geometry=value/(uv.size()*pairs.size());if(score)local.gradient=grad/(uv.size()*pairs.size());
+ if(!coarse){auto c=contour_term(p,uv,J,score);local.supplemental=c.value/pairs.size();local.gradient+=c.gradient/pairs.size();}
+}catch(...){failures[k]=std::current_exception();}}
+ for(size_t k=0;k<pairs.size();++k){if(failures[k])std::rethrow_exception(failures[k]);out.geometry+=per[k].geometry;out.appearance+=per[k].appearance;out.gradient+=per[k].gradient;}
+
+ for(const auto& p:per)out.supplemental+=p.supplemental;
+ out.value=out.geometry+out.appearance+out.supplemental;if(!std::isfinite(out.value)||!out.gradient.allFinite())throw std::runtime_error("Nonfinite objective");return out;
+}
+double audit_pixels(const std::vector<Pair>& pairs,const M4& T,double b){
+ double worst=0;for(auto& p:pairs){auto uv=project(p,T);std::vector<double> coords,score(uv.size()*4);for(auto u:uv){coords.push_back(u.x());coords.push_back(u.y());}if(cauchy_scores_native(p.xs.data(),p.xs.size()/2,p.ys.data(),p.ys.size()/2,p.ix.data(),p.iy.data(),p.ix.size(),coords.data(),uv.size(),b,score.data()))throw std::runtime_error("Cauchy audit state invalid");std::vector<std::pair<int,int>> pixels;for(int y=0;y<p.mask.rows;++y)for(int x=0;x<p.mask.cols;++x)if(p.mask.at<uint8_t>(y,x))pixels.emplace_back(x,y);
+ for(size_t i=0;i<uv.size();++i){auto u=uv[i];bool inside=u.x()>=-.5&&u.x()<p.mask.cols-.5&&u.y()>=-.5&&u.y()<p.mask.rows-.5&&p.mask.at<uint8_t>(int(std::floor(u.y()+.5)),int(std::floor(u.x()+.5)));if(inside)continue;auto interval=[&](int pixel,double center){long double l=static_cast<long double>(pixel)-.5L-center,r=l+1,s=b,h=std::max(std::max(std::abs(l),std::abs(r)),s),a=l/h,c=r/h,ss=s/h;return std::atan2(ss/h,a*c+ss*ss)/acosl(-1.L);};std::vector<long double> px(p.mask.cols),py(p.mask.rows);for(int x=0;x<p.mask.cols;++x)px[x]=interval(x,u.x());for(int y=0;y<p.mask.rows;++y)py[y]=interval(y,u.y());long double mass=0;for(auto [x,y]:pixels)mass+=px[x]*py[y];double logq=double(std::log(mass));double difference=std::abs(logq-score[4*i]);if(!std::isfinite(logq)||difference>1e-9)throw std::runtime_error("Independent original-pixel audit failed");worst=std::max(worst,difference);}}
+ return worst;
+}

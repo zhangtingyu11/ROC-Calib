@@ -1,33 +1,23 @@
-# Results
+# Paper results (2026-10-26)
 
-ROC-Calib region objective, ten frozen annotation groups. Errors are rotation angle and translation L2 distance.
+The current C++ configuration is `all-bounded-contour-no-gradient-sampling`. All ten archived solves completed, with all 220 selected associations and 34,178 points retained. No new full benchmark is claimed by this source release.
 
-| Group | Pairs | Rotation (°) | Translation (cm) |
-| --- | ---: | ---: | ---: |
-| KITTI Odometry 09 left | 20 | 0.2816 | 3.2029 |
-| KITTI Odometry 09 right | 20 | 0.0339 | 2.1304 |
-| KITTI Odometry 10 left | 20 | 0.3144 | 3.6882 |
-| KITTI Odometry 10 right | 20 | 0.2259 | 5.0433 |
-| nuScenes test group1 | 30 | 0.7197 | 6.0879 |
-| nuScenes test group2 | 30 | 0.5464 | 7.2677 |
-| CARLA static | 20 | 0.1113 | 1.6136 |
-| KITTI Raw | 20 | 0.2559 | 4.6780 |
-| PandaSet | 20 | 0.1256 | 9.3020 |
-| Waymo validation | 20 | 0.2240 | 6.0349 |
-| **Mean** | **220 total** | **0.2839** | **4.9049** |
+| Group | RRE (deg) | RTE (m) |
+|---|---:|---:|
+| KITTI09 left | 0.424986 | 0.031226 |
+| KITTI09 right | 0.235792 | 0.024936 |
+| KITTI10 left | 0.390620 | 0.030563 |
+| KITTI10 right | 0.373059 | 0.045566 |
+| nuScenes1 | 1.196095 | 0.073641 |
+| nuScenes2 | 0.520367 | 0.048637 |
+| CARLA | 0.095255 | 0.010277 |
+| KITTI Raw | 0.354249 | 0.042614 |
+| PandaSet | 0.157593 | 0.107167 |
+| Waymo | 0.314100 | 0.050856 |
+| Mean | **0.406212** | **0.046548** |
 
-Each group contributes equally to the mean. The total is 34,178 selected points. Configuration: [paper.json](../configs/paper.json). Machine-readable results: [results.json](../configs/results.json).
+RRE is the sum of absolute intrinsic ZYX Euler angles of the relative rotation in degrees. RTE is translation L2 distance in meters. Equal weighting across groups. The groups were used during development; this is not an independent annotation study.
 
-## Reproduce CARLA
+[Machine-readable archived metrics](../configs/paper-20261026-results.json). The public CARLA example preserves the same20 pairs and full clouds. Other datasets require licensed raw data and their prepared annotations; this release does not redistribute those inputs or claim one-command reproduction of all ten groups.
 
-Run the commands in the [demo](../demo/carla/README.md). The standalone package reproduces the saved CARLA matrix from the frozen object-derived PnP start. The expected matrix is read after fitting.
-
-The remaining groups require licensed source data and the original prepared inputs. Their summary metrics are provided here; the CARLA command does not reproduce all ten groups.
-
-## Scope
-
-Frame and object selection are manual. Reference information was available during preparation of some original annotation groups. These results measure fitting on the fixed observations; they do not measure reference-blind human repeatability or annotation time.
-
-The objective uses all selected points, equal object weights and exact distances to foreground pixel cells. It has no contour-attraction term. A low region loss alone does not establish physical accuracy or a unique pose.
-
-The later Cauchy experiment and the optional structural fitting tools are not included in this result table.
+[Legacy region-only results](legacy-results.md) remain separate and use a different rotation metric. The workbench still invokes that legacy solver.

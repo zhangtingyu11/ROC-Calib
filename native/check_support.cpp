@@ -1,0 +1,4 @@
+#include "contour.hpp"
+#include <iostream>
+int main(){auto test=[](std::vector<double> x,double expected){std::vector<V2> uv;std::vector<V3> xyz;for(double a:x){uv.emplace_back(a,0);xyz.emplace_back(a,0,1);}double s=chain_allowance(uv,xyz,0,{1,0});if(std::isfinite(expected)?!std::isfinite(s)||std::abs(s-expected)>1e-12:std::isfinite(s))throw std::runtime_error("support check");};test({0,1,2,3},1);test({0,8,16,24},8);test({0,1,2.1,3.3},1.1);test({0,100,101,102},NAN);test({0,1},NAN);test({0,0,1,2,3},1);
+Pair p;p.mask=cv::Mat::ones(3,3,CV_8U);prepare_contour(p);for(V2 u:std::vector<V2>{{.2,.3},{-2,.3},{3.2,2.7}}){auto c=supported_cost(p,u,.4);for(int a=0;a<2;++a){V2 d=V2::Zero();d[a]=1e-6;double fd=(supported_cost(p,u+d,.4).first-supported_cost(p,u-d,.4).first)/2e-6;if(std::abs(fd-c.second[a])>1e-8)throw std::runtime_error("gradient");}}std::cout<<"regular anisotropic gradual island missing duplicate slack-gradient passed; coherent occlusion not certified\n";}

@@ -1,3 +1,5 @@
+> This page describes the legacy workbench/Python solver. For the current paper C++ solver, see [paper solver](paper-solver.md).
+
 # Data format
 
 Use a ROS2 SQLite `.db3` bag or a directory of paired images and point clouds. For a directory, put `autocalib.json` beside the data:

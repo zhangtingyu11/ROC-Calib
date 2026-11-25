@@ -19,3 +19,5 @@ web/.wrangler/
 *.tsbuildinfo
 /demo/carla/clouds/
 /demo/carla/images/
+
+/build/
